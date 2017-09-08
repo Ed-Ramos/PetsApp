@@ -119,9 +119,9 @@ public class EditorActivity extends AppCompatActivity {
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
 
-        String nameString = mNameEditText.toString().trim();
-        String breedString = mBreedEditText.toString().trim();
-        String weightString = mWeightEditText.toString().trim();
+        String nameString = mNameEditText.getText().toString().trim();
+        String breedString = mBreedEditText.getText().toString().trim();
+        String weightString = mWeightEditText.getText().toString().trim();
         int weight = Integer.parseInt(weightString);
 
         Log.v("CatelogActivity","weight is" + weight);
