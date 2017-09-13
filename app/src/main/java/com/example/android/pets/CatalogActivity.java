@@ -15,6 +15,7 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,6 +29,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.pets.data.PetContract.PetEntry;
@@ -39,8 +41,10 @@ import com.example.android.pets.data.PetDbHelper;
  */
 public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    //Identifier for the pet data loader
     private static final int PET_LOADER = 0;
 
+    //Adapter for the ListView
     PetCursorAdapter mCursorAdapter;
 
 
@@ -69,10 +73,34 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         mCursorAdapter = new PetCursorAdapter(this, null);
         petListView.setAdapter(mCursorAdapter);
 
+        //Setup the item click listener
+        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                // Create new intent to go to {@link EditorActivity}
+                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
+
+                //Form the content uri that represents the specific pet that was clicked on,
+                //by appending the "id" passed as input to this method onto the
+                //{@link PetEntry#Content_URI}.
+                //For example, the URI would be "content://com.example.android.pets/pets/2"
+                //if the pet with ID 2 was clicked on
+                Uri currentPetUri = ContentUris.withAppendedId(PetEntry.CONTENT_URI, id);
+
+                intent.setData(currentPetUri);
+
+                startActivity(intent);
+
+            }
+
+        });
+
+        // kick off the loader
         getSupportLoaderManager().initLoader(PET_LOADER, null, this);
 
     }//End onCreate
-
 
     /**
      * Temporary helper method to display information in the onscreen TextView about the state of
@@ -128,7 +156,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         String[] projection = {
                 PetEntry._ID,
                 PetEntry.COLUMN_PET_NAME,
-                PetEntry.COLUMN_PET_BREED };
+                PetEntry.COLUMN_PET_BREED};
         // This loader will execute the ContentProvider's query method on a background thread
 
         return new CursorLoader(this,
